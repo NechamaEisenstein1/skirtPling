@@ -1,6 +1,5 @@
 # Render Blueprint: one free Docker web service (API + Angular).
-# Database: Azure SQL Database free offer (SQL Server). For Neon/PostgreSQL instead, set
-# Database__Provider to Postgres and paste the Neon URL (see docs/deploy-render.md).
+# Database: Azure SQL Database free offer (see docs/deploy-render.md).
 # Values marked sync: false are entered by you in the Render dashboard when you create the Blueprint.
 services:
   - type: web
@@ -10,8 +9,6 @@ services:
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
     envVars:
-      - key: Database__Provider
-        value: SqlServer
       - key: Database__InitializeOnStartup
         value: "true"        # applies EF Core migrations and seeds on start
       - key: ConnectionStrings__Default

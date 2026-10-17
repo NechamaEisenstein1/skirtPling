@@ -8,7 +8,7 @@ public class CartConfiguration : IEntityTypeConfiguration<Cart>
 {
     public void Configure(EntityTypeBuilder<Cart> builder)
     {
-        // Unique but nullable: SQL Server adds an "IS NOT NULL" filter by convention; PostgreSQL and SQLite allow many NULLs.
+        // Unique but nullable: SQL Server adds an "IS NOT NULL" filter by convention.
         builder.HasIndex(c => c.UserId).IsUnique();
         builder.HasIndex(c => c.GuestId).IsUnique();
         builder.HasOne<AppUser>().WithMany().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.Cascade);

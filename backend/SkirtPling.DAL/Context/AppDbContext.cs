@@ -4,8 +4,13 @@ using SkirtPling.DAL.Entities;
 
 namespace SkirtPling.DAL.Context;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<AppUser>(options)
+public class AppDbContext : IdentityDbContext<AppUser>
 {
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+    /// <summary>For derived contexts, which bring their own typed options.</summary>
+    protected AppDbContext(DbContextOptions options) : base(options) { }
+
     public DbSet<Brand> Brands => Set<Brand>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();
@@ -14,13 +19,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<Address> Addresses => Set<Address>();
-
-    protected override void ConfigureConventions(ModelConfigurationBuilder builder)
-    {
-        // SQLite has no decimal type and can't sort or sum decimals, so store money as REAL there.
-        if (Database.IsSqlite())
-            builder.Properties<decimal>().HaveConversion<double>();
-    }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -22,7 +22,7 @@ public sealed class TestDatabase : IDisposable
     public TestDatabase()
     {
         connection.Open();
-        Context = new AppDbContext(new DbContextOptionsBuilder<AppDbContext>().UseSqlite(connection).Options);
+        Context = new SqliteAppDbContext(new DbContextOptionsBuilder<SqliteAppDbContext>().UseSqlite(connection).Options);
         Context.Database.EnsureCreated();
 
         var brand = new Brand { Name = "Test Brand", Slug = "test-brand" };
