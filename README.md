@@ -13,7 +13,7 @@ backend, SQL Server through EF Core, an Angular 21 storefront and admin area, an
   inline stock edits, brands and categories, order status management, user roles and locking,
   legacy warehouse stock comparison.
 
-More detail: [docs/architecture.md](docs/architecture.md) · [docs/legacy-integration.md](docs/legacy-integration.md) · [docs/deploy-render-neon.md](docs/deploy-render-neon.md) (free hosting)
+More detail: [docs/architecture.md](docs/architecture.md) · [docs/legacy-integration.md](docs/legacy-integration.md) · [docs/deploy-render.md](docs/deploy-render.md) (free hosting)
 
 ## Folder structure
 
@@ -205,8 +205,9 @@ Errors are returned as RFC 7807 problem details (`title`, `detail`, and `errors`
 ## Deployment
 
 `Dockerfile` builds one image in which the API also serves the Angular app. `render.yaml` deploys it to
-Render's free tier with a Neon PostgreSQL database; see [docs/deploy-render-neon.md](docs/deploy-render-neon.md).
-That image was tested locally against PostgreSQL 17 with the same browser walkthrough.
+Render's free tier with the Azure SQL Database free offer (Neon PostgreSQL is supported as an alternative);
+see [docs/deploy-render.md](docs/deploy-render.md). The image was tested locally against SQL Server 2022
+and PostgreSQL 17 with the same browser walkthrough.
 
 ## Known limitations and simplifications
 

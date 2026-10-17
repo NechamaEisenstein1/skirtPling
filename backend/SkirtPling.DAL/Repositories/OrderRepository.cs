@@ -52,45 +52,49 @@ public class OrderRepository(AppDbContext db) : IOrderRepository
     public Task<Order?> GetByIdAsync(int id, CancellationToken ct) =>
         db.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == id, ct);
 
-    public async Task<bool> CreateWithStockReservationAsync(Order order, CancellationToken ct)
-    {
-        await using var transaction = await db.Database.BeginTransactionAsync(ct);
-
-        foreach (var item in order.Items)
+    public Task<bool> CreateWithStockReservationAsync(Order order, CancellationToken ct) =>
+        // With retry-on-failure enabled, a manual transaction must run inside the execution strategy
+        // so the whole unit is retried together.
+        db.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
         {
-            // A conditional UPDATE is atomic in the database, so two concurrent checkouts can't both take the last unit.
-            var updatedRows = await db.Products
-                .Where(p => p.Id == item.ProductId && p.IsActive && p.StockQuantity >= item.Quantity)
-                .ExecuteUpdateAsync(s => s.SetProperty(p => p.StockQuantity, p => p.StockQuantity - item.Quantity), ct);
+            await using var transaction = await db.Database.BeginTransactionAsync(ct);
 
-            if (updatedRows == 0)
+            foreach (var item in order.Items)
             {
-                await transaction.RollbackAsync(ct);
-                return false;
+                // A conditional UPDATE is atomic in the database, so two concurrent checkouts can't both take the last unit.
+                var updatedRows = await db.Products
+                    .Where(p => p.Id == item.ProductId && p.IsActive && p.StockQuantity >= item.Quantity)
+                    .ExecuteUpdateAsync(s => s.SetProperty(p => p.StockQuantity, p => p.StockQuantity - item.Quantity), ct);
+
+                if (updatedRows == 0)
+                {
+                    await transaction.RollbackAsync(ct);
+                    return false;
+                }
             }
-        }
 
-        db.Orders.Add(order);
-        await db.SaveChangesAsync(ct);
-        await transaction.CommitAsync(ct);
-        return true;
-    }
+            db.Orders.Add(order);
+            await db.SaveChangesAsync(ct);
+            await transaction.CommitAsync(ct);
+            return true;
+        });
 
-    public async Task CancelAndRestockAsync(Order order, CancellationToken ct)
-    {
-        await using var transaction = await db.Database.BeginTransactionAsync(ct);
-
-        foreach (var item in order.Items)
+    public Task CancelAndRestockAsync(Order order, CancellationToken ct) =>
+        db.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
         {
-            await db.Products
-                .Where(p => p.Id == item.ProductId)
-                .ExecuteUpdateAsync(s => s.SetProperty(p => p.StockQuantity, p => p.StockQuantity + item.Quantity), ct);
-        }
+            await using var transaction = await db.Database.BeginTransactionAsync(ct);
 
-        order.Status = OrderStatus.Cancelled;
-        await db.SaveChangesAsync(ct);
-        await transaction.CommitAsync(ct);
-    }
+            foreach (var item in order.Items)
+            {
+                await db.Products
+                    .Where(p => p.Id == item.ProductId)
+                    .ExecuteUpdateAsync(s => s.SetProperty(p => p.StockQuantity, p => p.StockQuantity + item.Quantity), ct);
+            }
+
+            order.Status = OrderStatus.Cancelled;
+            await db.SaveChangesAsync(ct);
+            await transaction.CommitAsync(ct);
+        });
 
     public Task SaveChangesAsync(CancellationToken ct) => db.SaveChangesAsync(ct);
 }
