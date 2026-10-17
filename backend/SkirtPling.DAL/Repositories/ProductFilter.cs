@@ -5,7 +5,8 @@ public enum ProductSort
     Newest,
     PriceAsc,
     PriceDesc,
-    Name
+    Name,
+    StockAsc
 }
 
 /// <summary>Search criteria for products. Page is 1-based.</summary>

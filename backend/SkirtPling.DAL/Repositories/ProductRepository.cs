@@ -47,6 +47,7 @@ public class ProductRepository(AppDbContext db) : IProductRepository
             ProductSort.PriceAsc => query.OrderBy(p => p.Price).ThenBy(p => p.Id),
             ProductSort.PriceDesc => query.OrderByDescending(p => p.Price).ThenBy(p => p.Id),
             ProductSort.Name => query.OrderBy(p => p.Name).ThenBy(p => p.Id),
+            ProductSort.StockAsc => query.OrderBy(p => p.StockQuantity).ThenBy(p => p.Id),
             _ => query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id)
         };
 

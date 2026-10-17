@@ -1,0 +1,61 @@
+<h1>Brands & categories</h1>
+
+<div class="panels">
+  <section class="card">
+    <div class="page-header">
+      <h2>Brands</h2>
+      <button class="btn btn-outline btn-sm" type="button" (click)="editBrand()">Add brand</button>
+    </div>
+
+    @if (brandDraft(); as draft) {
+      <form class="editor" (ngSubmit)="saveBrand()">
+        <input name="brandName" [(ngModel)]="draft.name" placeholder="Brand name" aria-label="Brand name" required minlength="2" maxlength="100" />
+        <textarea name="brandDescription" [(ngModel)]="draft.description" placeholder="Short description" aria-label="Brand description" rows="2" maxlength="1000"></textarea>
+        <div class="form-actions">
+          <button class="btn btn-sm" type="submit" [disabled]="draft.name.trim().length < 2">{{ draft.id ? 'Save' : 'Create' }}</button>
+          <button class="btn btn-outline btn-sm" type="button" (click)="brandDraft.set(null)">Cancel</button>
+        </div>
+      </form>
+    }
+
+    @for (brand of brands.value() ?? []; track brand.id) {
+      <div class="item">
+        <div>
+          <strong>{{ brand.name }}</strong>
+          <div class="muted description">{{ brand.description }}</div>
+        </div>
+        <div>
+          <button class="btn-link" type="button" (click)="editBrand(brand)">Edit</button>
+          <button class="btn-link danger" type="button" (click)="deleteBrand(brand)">Delete</button>
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="card">
+    <div class="page-header">
+      <h2>Categories</h2>
+      <button class="btn btn-outline btn-sm" type="button" (click)="editCategory()">Add category</button>
+    </div>
+
+    @if (categoryDraft(); as draft) {
+      <form class="editor" (ngSubmit)="saveCategory()">
+        <input name="categoryName" [(ngModel)]="draft.name" placeholder="Category name" aria-label="Category name" required minlength="2" maxlength="100" />
+        <div class="form-actions">
+          <button class="btn btn-sm" type="submit" [disabled]="draft.name.trim().length < 2">{{ draft.id ? 'Save' : 'Create' }}</button>
+          <button class="btn btn-outline btn-sm" type="button" (click)="categoryDraft.set(null)">Cancel</button>
+        </div>
+      </form>
+    }
+
+    @for (category of categories.value() ?? []; track category.id) {
+      <div class="item">
+        <strong>{{ category.name }}</strong>
+        <div>
+          <button class="btn-link" type="button" (click)="editCategory(category)">Edit</button>
+          <button class="btn-link danger" type="button" (click)="deleteCategory(category)">Delete</button>
+        </div>
+      </div>
+    }
+  </section>
+</div>

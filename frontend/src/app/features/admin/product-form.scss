@@ -1,0 +1,35 @@
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.small { font-size: 0.85rem; }
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 44px 2fr 1fr auto;
+  gap: 10px;
+  align-items: center;
+  &.spec { grid-template-columns: 1fr 2fr auto; }
+}
+
+.preview {
+  width: 44px;
+  height: 55px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  display: block;
+}
+
+@media (max-width: 700px) {
+  .row, .row.spec { grid-template-columns: 1fr; }
+}

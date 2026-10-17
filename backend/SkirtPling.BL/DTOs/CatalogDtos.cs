@@ -43,7 +43,7 @@ public record ProductQueryDto
     [Range(0, 100000)] public decimal? MinPrice { get; init; }
     [Range(0, 100000)] public decimal? MaxPrice { get; init; }
     public bool InStockOnly { get; init; }
-    /// <summary>newest | price-asc | price-desc | name</summary>
+    /// <summary>newest | price-asc | price-desc | name | stock</summary>
     public string? Sort { get; init; }
     [Range(1, int.MaxValue)] public int Page { get; init; } = 1;
     [Range(1, 50)] public int PageSize { get; init; } = 12;

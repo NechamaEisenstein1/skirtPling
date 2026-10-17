@@ -1,0 +1,55 @@
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <span class="eyebrow">New season collection</span>
+      <h1>Skirts that move with you</h1>
+      <p>Pleats, A-lines, maxis and denim from five independent labels. Elegant lengths, honest fabrics, free shipping from ₪300.</p>
+      <div class="hero-actions">
+        <a class="btn btn-accent" routerLink="/shop">Shop all skirts</a>
+        <a class="btn btn-outline" routerLink="/shop" [queryParams]="{ sort: 'newest' }">New arrivals</a>
+      </div>
+    </div>
+    <img class="hero-image" src="/images/products/sp-pl-001-1.svg" alt="Navy pleated midi skirt" />
+  </div>
+</section>
+
+<section class="container section">
+  <h2>Shop by style</h2>
+  <div class="categories">
+    @for (category of categories.value() ?? []; track category.id) {
+      <a class="category" routerLink="/shop" [queryParams]="{ categoryIds: category.id }">
+        <span>{{ category.name }}</span>
+      </a>
+    }
+  </div>
+</section>
+
+<section class="container section">
+  <div class="page-header">
+    <h2>New arrivals</h2>
+    <a routerLink="/shop">View all</a>
+  </div>
+  @if (newArrivals.isLoading()) {
+    <div class="state"><div class="spinner"></div>Loading products…</div>
+  } @else if (newArrivals.error()) {
+    <div class="state">We couldn't load products right now. Please make sure the API is running.</div>
+  } @else {
+    <div class="grid">
+      @for (product of newArrivals.value()?.items ?? []; track product.id) {
+        <app-product-card [product]="product" />
+      }
+    </div>
+  }
+</section>
+
+<section class="container section">
+  <h2>Our brands</h2>
+  <div class="brands">
+    @for (brand of brands.value() ?? []; track brand.id) {
+      <a class="brand card" routerLink="/shop" [queryParams]="{ brandIds: brand.id }">
+        <h3>{{ brand.name }}</h3>
+        <p class="muted">{{ brand.description }}</p>
+      </a>
+    }
+  </div>
+</section>

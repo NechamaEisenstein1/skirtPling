@@ -1,0 +1,95 @@
+<div class="container page">
+  <h1>Checkout</h1>
+
+  @if (cart().items.length === 0) {
+    <div class="state">
+      <h2>Your cart is empty</h2>
+      <a class="btn" routerLink="/shop">Back to the shop</a>
+    </div>
+  } @else {
+    <form class="layout" [formGroup]="form" (ngSubmit)="placeOrder()" novalidate>
+      <div class="steps">
+        <section class="card">
+          <h2>1. Shipping address</h2>
+          @if (savedAddresses.value()?.length) {
+            <div class="saved">
+              <span class="muted">Use a saved address:</span>
+              @for (address of savedAddresses.value(); track address.id) {
+                <button class="btn btn-outline btn-sm" type="button" (click)="useAddress(address)">{{ address.label }}</button>
+              }
+            </div>
+          }
+          <div class="form-grid" formGroupName="shippingAddress">
+            <div class="field">
+              <label for="fullName">Full name</label>
+              <input id="fullName" formControlName="fullName" autocomplete="name" />
+              @if (isInvalid('fullName')) { <span class="field-error">Please enter the recipient's name.</span> }
+            </div>
+            <div class="field">
+              <label for="phone">Phone</label>
+              <input id="phone" formControlName="phone" autocomplete="tel" />
+              @if (isInvalid('phone')) { <span class="field-error">Please enter a valid phone number.</span> }
+            </div>
+            <div class="field full">
+              <label for="street">Street and number</label>
+              <input id="street" formControlName="street" autocomplete="street-address" />
+              @if (isInvalid('street')) { <span class="field-error">Please enter the street address.</span> }
+            </div>
+            <div class="field">
+              <label for="city">City</label>
+              <input id="city" formControlName="city" autocomplete="address-level2" />
+              @if (isInvalid('city')) { <span class="field-error">Please enter the city.</span> }
+            </div>
+            <div class="field">
+              <label for="postalCode">Postal code</label>
+              <input id="postalCode" formControlName="postalCode" autocomplete="postal-code" />
+              @if (isInvalid('postalCode')) { <span class="field-error">Please enter the postal code.</span> }
+            </div>
+            <div class="field">
+              <label for="country">Country</label>
+              <input id="country" formControlName="country" autocomplete="country-name" />
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>2. Payment</h2>
+          <p class="notice">
+            This is a demo store with a sandbox payment provider. No card details are collected; pick a test outcome below.
+          </p>
+          <label class="checkbox">
+            <input type="radio" formControlName="paymentToken" [value]="paymentTokens.approved" />
+            Test card: payment approved
+          </label>
+          <label class="checkbox">
+            <input type="radio" formControlName="paymentToken" [value]="paymentTokens.declined" />
+            Test card: payment declined
+          </label>
+        </section>
+      </div>
+
+      <aside class="summary card">
+        <h2>Order summary</h2>
+        <ul>
+          @for (item of cart().items; track item.productId) {
+            <li>
+              <span>{{ item.quantity }} × {{ item.name }}</span>
+              <span>{{ item.lineTotal | currency: 'ILS' }}</span>
+            </li>
+          }
+        </ul>
+        <div class="row"><span>Subtotal</span><span>{{ cart().subtotal | currency: 'ILS' }}</span></div>
+        <div class="row"><span>Shipping</span><span>{{ cart().shippingCost === 0 ? 'Free' : (cart().shippingCost | currency: 'ILS') }}</span></div>
+        <div class="row total"><span>Total</span><span>{{ cart().total | currency: 'ILS' }}</span></div>
+
+        @if (error()) {
+          <div class="form-error" role="alert">{{ error() }}</div>
+        }
+        <button class="btn btn-accent btn-block" type="submit" [disabled]="submitting()">
+          {{ submitting() ? 'Placing order…' : 'Place order' }}
+        </button>
+        <p class="muted small">Prices and stock are confirmed by the store when you place the order.</p>
+      </aside>
+    </form>
+  }
+</div>

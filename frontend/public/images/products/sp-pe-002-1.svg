@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <rect width="400" height="500" fill="rgb(233, 222, 225)"/>
+  <ellipse cx="200" cy="470" rx="140" ry="12" fill="rgb(87, 28, 42)" opacity="0.15"/>
+  <rect x="140" y="78" width="120" height="24" rx="4" fill="rgb(82, 26, 40)"/><path d="M140 102 L260 102 L252 360 L148 360 Z" fill="#6d2335"/><path d="M200 330 L200 360" stroke="rgb(82, 26, 40)" stroke-width="3"/>
+</svg>

@@ -1,0 +1,116 @@
+<div class="page-header">
+  <h1>{{ isNew() ? 'Add product' : 'Edit product' }}</h1>
+  <a routerLink="/admin/products">← Back to products</a>
+</div>
+
+@if (loadError()) {
+  <div class="form-error">{{ loadError() }}</div>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+    @if (error()) {
+      <div class="form-error" role="alert">{{ error() }}</div>
+    }
+
+    <section class="card">
+      <h2>Basics</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label for="sku">SKU</label>
+          <input id="sku" formControlName="sku" />
+          @if (form.controls.sku.invalid && form.controls.sku.touched) {
+            <span class="field-error">3–40 letters, digits or dashes.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" formControlName="name" />
+          @if (form.controls.name.invalid && form.controls.name.touched) {
+            <span class="field-error">Please enter a name.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="brand">Brand</label>
+          <select id="brand" formControlName="brandId">
+            <option [ngValue]="0" disabled>Choose a brand</option>
+            @for (brand of brands.value() ?? []; track brand.id) {
+              <option [ngValue]="brand.id">{{ brand.name }}</option>
+            }
+          </select>
+          @if (form.controls.brandId.invalid && form.controls.brandId.touched) {
+            <span class="field-error">Choose a brand.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" formControlName="categoryId">
+            <option [ngValue]="0" disabled>Choose a category</option>
+            @for (category of categories.value() ?? []; track category.id) {
+              <option [ngValue]="category.id">{{ category.name }}</option>
+            }
+          </select>
+          @if (form.controls.categoryId.invalid && form.controls.categoryId.touched) {
+            <span class="field-error">Choose a category.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="price">Price (₪)</label>
+          <input id="price" type="number" step="0.01" min="0" formControlName="price" />
+          @if (form.controls.price.invalid && form.controls.price.touched) {
+            <span class="field-error">Price must be greater than 0.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="stock">Stock</label>
+          <input id="stock" type="number" min="0" formControlName="stockQuantity" />
+          @if (form.controls.stockQuantity.invalid && form.controls.stockQuantity.touched) {
+            <span class="field-error">Stock cannot be negative.</span>
+          }
+        </div>
+        <div class="field full">
+          <label for="description">Description</label>
+          <textarea id="description" rows="4" formControlName="description"></textarea>
+        </div>
+        <label class="checkbox"><input type="checkbox" formControlName="isActive" /> Visible in the store</label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Images</h2>
+      <p class="muted small">Image URLs, in gallery order. Seeded images live in <code>frontend/public/images/products</code>.</p>
+      <div formArrayName="images" class="rows">
+        @for (image of images.controls; track image; let i = $index) {
+          <div class="row" [formGroupName]="i">
+            @if (image.value.url) {
+              <img class="preview" [src]="image.value.url" alt="" />
+            } @else {
+              <span class="preview"></span>
+            }
+            <input formControlName="url" placeholder="/images/products/my-skirt.svg" aria-label="Image URL" />
+            <input formControlName="altText" placeholder="Alt text" aria-label="Alt text" />
+            <button class="btn-link danger" type="button" (click)="images.removeAt(i)">Remove</button>
+          </div>
+        }
+      </div>
+      <button class="btn btn-outline btn-sm" type="button" (click)="addImage()">Add image</button>
+    </section>
+
+    <section class="card">
+      <h2>Specifications</h2>
+      <div formArrayName="specifications" class="rows">
+        @for (spec of specifications.controls; track spec; let i = $index) {
+          <div class="row spec" [formGroupName]="i">
+            <input formControlName="name" placeholder="e.g. Fabric" aria-label="Specification name" />
+            <input formControlName="value" placeholder="e.g. Linen" aria-label="Specification value" />
+            <button class="btn-link danger" type="button" (click)="specifications.removeAt(i)">Remove</button>
+          </div>
+        }
+      </div>
+      <button class="btn btn-outline btn-sm" type="button" (click)="addSpec()">Add specification</button>
+    </section>
+
+    <div class="form-actions">
+      <button class="btn btn-accent" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save product' }}</button>
+      <a class="btn btn-outline" routerLink="/admin/products">Cancel</a>
+    </div>
+  </form>
+}

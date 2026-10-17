@@ -1,0 +1,88 @@
+<div class="container page">
+  @if (product.isLoading() && !product.value()) {
+    <div class="state"><div class="spinner"></div>Loading…</div>
+  } @else if (product.error()) {
+    <div class="state">
+      <h2>Product not found</h2>
+      <p>It may have been removed from the store.</p>
+      <a class="btn" routerLink="/shop">Back to the shop</a>
+    </div>
+  } @else if (product.value(); as p) {
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a routerLink="/shop">Shop</a> /
+      <a routerLink="/shop" [queryParams]="{ categoryIds: p.category.id }">{{ p.category.name }}</a> /
+      <span>{{ p.name }}</span>
+    </nav>
+
+    <div class="details">
+      <div class="gallery">
+        <div class="main-image">
+          @if (p.images.length) {
+            <img [src]="p.images[selectedImage()].url" [alt]="p.images[selectedImage()].altText" />
+          } @else {
+            <img src="/images/placeholder.svg" [alt]="p.name" />
+          }
+        </div>
+        @if (p.images.length > 1) {
+          <div class="thumbs">
+            @for (image of p.images; track image.id; let i = $index) {
+              <button type="button" [class.active]="i === selectedImage()" (click)="selectedImage.set(i)" [attr.aria-label]="'Show image ' + (i + 1)">
+                <img [src]="image.url" [alt]="image.altText" />
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="info">
+        <a class="brand" routerLink="/shop" [queryParams]="{ brandIds: p.brand.id }">{{ p.brand.name }}</a>
+        <h1>{{ p.name }}</h1>
+        <div class="price-row">
+          <span class="price">{{ p.price | currency: 'ILS' }}</span>
+          <app-stock-badge [stock]="p.stockQuantity" />
+        </div>
+        <p class="description">{{ p.description }}</p>
+
+        @if (p.inStock) {
+          <div class="buy">
+            <label>
+              <span class="sr-only">Quantity</span>
+              <select [value]="quantity()" (change)="quantity.set(+$any($event.target).value)" aria-label="Quantity">
+                @for (n of quantityOptions(); track n) {
+                  <option [value]="n">{{ n }}</option>
+                }
+              </select>
+            </label>
+            <button class="btn" type="button" [disabled]="adding()" (click)="addToCart()">Add to cart</button>
+            <button class="btn btn-accent" type="button" [disabled]="adding()" (click)="addToCart(true)">Buy now</button>
+          </div>
+        } @else {
+          <p class="sold-out">This skirt is sold out. Check back soon.</p>
+        }
+
+        @if (p.specifications.length) {
+          <h2>Details</h2>
+          <dl class="specs">
+            <dt>SKU</dt>
+            <dd>{{ p.sku }}</dd>
+            @for (spec of p.specifications; track spec.name) {
+              <dt>{{ spec.name }}</dt>
+              <dd>{{ spec.value }}</dd>
+            }
+          </dl>
+        }
+      </div>
+    </div>
+
+    @if (p.relatedProducts.length) {
+      <section class="related">
+        <h2>You may also like</h2>
+        <div class="grid">
+          @for (related of p.relatedProducts; track related.id) {
+            <app-product-card [product]="related" />
+          }
+        </div>
+      </section>
+    }
+  }
+</div>

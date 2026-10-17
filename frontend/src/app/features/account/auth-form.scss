@@ -1,0 +1,14 @@
+.auth-page {
+  display: flex;
+  justify-content: center;
+}
+
+form {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hint { font-size: 0.8rem; }

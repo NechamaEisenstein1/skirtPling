@@ -132,6 +132,7 @@ public class ProductService(
         "price-asc" => ProductSort.PriceAsc,
         "price-desc" => ProductSort.PriceDesc,
         "name" => ProductSort.Name,
+        "stock" => ProductSort.StockAsc,
         _ => ProductSort.Newest
     };
 }

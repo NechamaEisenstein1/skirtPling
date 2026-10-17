@@ -1,0 +1,57 @@
+<div class="container page">
+  <div class="page-header">
+    <h1>My account</h1>
+    <a class="btn btn-outline" routerLink="/account/orders">My orders</a>
+  </div>
+
+  <div class="sections">
+    <section class="card">
+      <h2>Profile</h2>
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
+        <div class="form-grid">
+          <div class="field"><label for="p-email">Email</label><input id="p-email" formControlName="email" /></div>
+          <div class="field">
+            <label for="p-name">Full name</label>
+            <input id="p-name" formControlName="fullName" />
+            @if (profileForm.controls.fullName.invalid && profileForm.controls.fullName.touched) {
+              <span class="field-error">Please enter your name.</span>
+            }
+          </div>
+          <div class="field"><label for="p-phone">Phone</label><input id="p-phone" formControlName="phoneNumber" /></div>
+        </div>
+        <div class="form-actions"><button class="btn" type="submit">Save profile</button></div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="page-header">
+        <h2>Saved addresses</h2>
+        @if (editing() === null) {
+          <button class="btn btn-outline btn-sm" type="button" (click)="editing.set('new')">Add address</button>
+        }
+      </div>
+
+      @if (editing() !== null) {
+        <app-address-form [address]="editing() === 'new' ? null : $any(editing())" [busy]="busy()"
+          (saved)="saveAddress($event)" (cancelled)="editing.set(null)" />
+      } @else if (addresses.value()?.length === 0) {
+        <p class="muted">No saved addresses yet. Saved addresses can be picked at checkout.</p>
+      } @else {
+        <ul class="addresses">
+          @for (address of addresses.value() ?? []; track address.id) {
+            <li>
+              <div>
+                <strong>{{ address.label }}</strong><br />
+                <span class="muted">{{ address.fullName }}, {{ address.street }}, {{ address.city }} {{ address.postalCode }}</span>
+              </div>
+              <div>
+                <button class="btn-link" type="button" (click)="editAddress(address)">Edit</button>
+                <button class="btn-link danger" type="button" (click)="deleteAddress(address)">Delete</button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</div>

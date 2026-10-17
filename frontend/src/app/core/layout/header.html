@@ -1,0 +1,33 @@
+<header class="header">
+  <div class="container bar">
+    <a routerLink="/" class="logo" aria-label="SkirtPling home">Skirt<span>Pling</span></a>
+
+    <form class="search" role="search" (submit)="$event.preventDefault(); search(term.value)">
+      <label for="site-search" class="sr-only">Search products</label>
+      <input #term id="site-search" type="search" placeholder="Search skirts, brands, SKU…" />
+    </form>
+
+    <button class="menu-toggle" type="button" (click)="menuOpen.set(!menuOpen())" [attr.aria-expanded]="menuOpen()" aria-controls="main-nav">
+      Menu
+    </button>
+
+    <nav id="main-nav" class="nav" [class.open]="menuOpen()" (click)="menuOpen.set(false)">
+      <a routerLink="/shop" routerLinkActive="active">Shop</a>
+      @if (auth.isAdmin()) {
+        <a routerLink="/admin" routerLinkActive="active">Admin</a>
+      }
+      @if (auth.isSignedIn()) {
+        <a routerLink="/account" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">My account</a>
+        <button type="button" class="btn-link" (click)="auth.logout()">Sign out</button>
+      } @else {
+        <a routerLink="/account/login" routerLinkActive="active">Sign in</a>
+      }
+      <a routerLink="/cart" class="cart-link" routerLinkActive="active" [attr.aria-label]="'Cart with ' + cart.itemCount() + ' items'">
+        Cart
+        @if (cart.itemCount() > 0) {
+          <span class="cart-count">{{ cart.itemCount() }}</span>
+        }
+      </a>
+    </nav>
+  </div>
+</header>

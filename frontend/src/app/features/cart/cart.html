@@ -1,0 +1,56 @@
+<div class="container page">
+  <h1>Your cart</h1>
+
+  @if (cart().items.length === 0) {
+    <div class="state">
+      <h2>Your cart is empty</h2>
+      <p>Find something you love in our collection.</p>
+      <a class="btn" routerLink="/shop">Start shopping</a>
+    </div>
+  } @else {
+    <div class="layout">
+      <ul class="items">
+        @for (item of cart().items; track item.productId) {
+          <li class="item" [class.busy]="busyProductId() === item.productId">
+            <a [routerLink]="['/products', item.productId]" class="thumb">
+              <img [src]="item.imageUrl ?? '/images/placeholder.svg'" [alt]="item.name" />
+            </a>
+            <div class="item-info">
+              <a [routerLink]="['/products', item.productId]" class="name">{{ item.name }}</a>
+              <span class="muted">{{ item.unitPrice | currency: 'ILS' }} each</span>
+              @if (item.quantity > item.availableStock) {
+                <span class="field-error">
+                  {{ item.availableStock === 0 ? 'Sold out. Please remove it.' : 'Only ' + item.availableStock + ' left. Please lower the quantity.' }}
+                </span>
+              }
+            </div>
+            <select [value]="item.quantity" (change)="changeQuantity(item, +$any($event.target).value)" [attr.aria-label]="'Quantity of ' + item.name">
+              @for (n of quantityOptions(item); track n) {
+                <option [value]="n">{{ n }}</option>
+              }
+            </select>
+            <strong class="line-total">{{ item.lineTotal | currency: 'ILS' }}</strong>
+            <button class="btn-link danger" type="button" (click)="remove(item)">Remove</button>
+          </li>
+        }
+      </ul>
+
+      <aside class="summary card">
+        <h2>Summary</h2>
+        <div class="row"><span>Subtotal</span><span>{{ cart().subtotal | currency: 'ILS' }}</span></div>
+        <div class="row">
+          <span>Shipping</span>
+          <span>{{ cart().shippingCost === 0 ? 'Free' : (cart().shippingCost | currency: 'ILS') }}</span>
+        </div>
+        @if (amountToFreeShipping() > 0) {
+          <p class="hint">Add {{ amountToFreeShipping() | currency: 'ILS' }} more for free shipping.</p>
+        }
+        <div class="row total"><span>Total</span><span>{{ cart().total | currency: 'ILS' }}</span></div>
+        <a class="btn btn-accent btn-block" routerLink="/checkout" [class.disabled]="hasStockProblem()" [attr.aria-disabled]="hasStockProblem()">
+          Proceed to checkout
+        </a>
+        <a class="continue" routerLink="/shop">Continue shopping</a>
+      </aside>
+    </div>
+  }
+</div>
