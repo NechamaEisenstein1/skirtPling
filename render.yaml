@@ -1,0 +1,24 @@
+# Render Blueprint: one free Docker web service (API + Angular). The database is Neon (PostgreSQL).
+# Values marked sync: false are entered by you in the Render dashboard when you create the Blueprint.
+services:
+  - type: web
+    name: skirtpling
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: Database__Provider
+        value: Postgres
+      - key: Database__InitializeOnStartup
+        value: "true"
+      - key: ConnectionStrings__Default
+        sync: false          # paste the Neon connection string
+      - key: Jwt__Key
+        generateValue: true  # Render creates a random secret
+      - key: Seed__SeedCatalog
+        value: "true"
+      - key: Seed__AdminEmail
+        sync: false          # the admin account to create on first start
+      - key: Seed__AdminPassword
+        sync: false          # min. 8 chars with upper, lower case and a digit

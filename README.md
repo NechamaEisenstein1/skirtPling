@@ -13,7 +13,7 @@ backend, SQL Server through EF Core, an Angular 21 storefront and admin area, an
   inline stock edits, brands and categories, order status management, user roles and locking,
   legacy warehouse stock comparison.
 
-More detail: [docs/architecture.md](docs/architecture.md) · [docs/legacy-integration.md](docs/legacy-integration.md)
+More detail: [docs/architecture.md](docs/architecture.md) · [docs/legacy-integration.md](docs/legacy-integration.md) · [docs/deploy-render-neon.md](docs/deploy-render-neon.md) (free hosting)
 
 ## Folder structure
 
@@ -39,6 +39,7 @@ skirtPling/
 │       │   └── app.routes.ts
 │       └── environments/
 ├── docs/
+├── Dockerfile, render.yaml        One-container deployment (API + Angular) for Render
 ├── docker-compose.yml             Optional SQL Server for macOS/Linux
 └── README.md
 ```
@@ -112,7 +113,7 @@ All settings are in `backend/SkirtPling.Api/appsettings.json`; Development overr
 | Key | Purpose | Development value |
 |---|---|---|
 | `ConnectionStrings:Default` | SQL Server connection | LocalDB |
-| `Database:Provider` | `SqlServer` (default) or `Sqlite` (tests, quick demos without migrations) | `SqlServer` |
+| `Database:Provider` | `SqlServer` (default, with migrations), `Postgres` (hosting on Neon) or `Sqlite` (tests); the last two create the schema without migrations | `SqlServer` |
 | `Database:InitializeOnStartup` | Apply migrations and seed at startup | `true` |
 | `Jwt:Key` | HMAC signing key, ≥ 32 chars. **The API refuses to start without it.** | dev-only key |
 | `Jwt:ExpiryMinutes` | Token lifetime | 120 |
@@ -148,7 +149,7 @@ Results from the last run (in this repository's development container):
 
 | Suite | Result |
 |---|---|
-| Backend (`dotnet test`) | **39 passed**, 0 failed |
+| Backend (`dotnet test`) | **41 passed**, 0 failed |
 | Frontend (`ng test`) | **12 passed**, 0 failed |
 | `dotnet build` (main solution and `LegacyIntegration.sln`) | succeeded, 0 warnings |
 | `ng build` (production) | succeeded |
@@ -200,6 +201,12 @@ All routes are under `/api`. 🔒 = signed in, 👑 = Admin role.
 | GET | `/health` (no `/api`) | Health check including the database |
 
 Errors are returned as RFC 7807 problem details (`title`, `detail`, and `errors` for validation).
+
+## Deployment
+
+`Dockerfile` builds one image in which the API also serves the Angular app. `render.yaml` deploys it to
+Render's free tier with a Neon PostgreSQL database; see [docs/deploy-render-neon.md](docs/deploy-render-neon.md).
+That image was tested locally against PostgreSQL 17 with the same browser walkthrough.
 
 ## Known limitations and simplifications
 

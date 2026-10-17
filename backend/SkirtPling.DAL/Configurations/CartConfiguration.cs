@@ -8,8 +8,9 @@ public class CartConfiguration : IEntityTypeConfiguration<Cart>
 {
     public void Configure(EntityTypeBuilder<Cart> builder)
     {
-        builder.HasIndex(c => c.UserId).IsUnique().HasFilter("[UserId] IS NOT NULL");
-        builder.HasIndex(c => c.GuestId).IsUnique().HasFilter("[GuestId] IS NOT NULL");
+        // Unique but nullable: SQL Server adds an "IS NOT NULL" filter by convention; PostgreSQL and SQLite allow many NULLs.
+        builder.HasIndex(c => c.UserId).IsUnique();
+        builder.HasIndex(c => c.GuestId).IsUnique();
         builder.HasOne<AppUser>().WithMany().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.Cascade);
         builder.HasMany(c => c.Items).WithOne().HasForeignKey(i => i.CartId).OnDelete(DeleteBehavior.Cascade);
     }

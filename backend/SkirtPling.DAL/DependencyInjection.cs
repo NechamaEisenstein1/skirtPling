@@ -15,12 +15,15 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("Default")
             ?? throw new InvalidOperationException("Connection string 'Default' is not configured.");
 
-        // SQL Server is the real database. SQLite exists for automated tests and quick demos without SQL Server.
+        // SQL Server is the main database (with migrations). PostgreSQL is for hosting on Neon/Render,
+        // SQLite for automated tests and quick demos; both of those create the schema without migrations.
         var provider = configuration["Database:Provider"] ?? "SqlServer";
         services.AddDbContext<AppDbContext>(options =>
         {
             if (provider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
                 options.UseSqlite(connectionString);
+            else if (provider.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
+                options.UseNpgsql(PostgresConnectionString.Normalize(connectionString));
             else
                 options.UseSqlServer(connectionString);
         });
